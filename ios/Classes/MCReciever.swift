@@ -54,7 +54,8 @@ extension MCReceiver: MCSessionDelegate {
             //Try to decode json recieved form peer
             let decodedFileChunk = try JSONDecoder().decode(FileChunk.self, from: data)
             //Parse
-            let args = ["id": decodedFileChunk.id, "data": decodedFileChunk.data]  as [String : Any]
+            let backToFLutterType = FlutterStandardTypedData(bytes: Data(decodedFileChunk.data))
+            let args = ["id": decodedFileChunk.id, "data": backToFLutterType]  as [String : Any]
             
             print("Chunk recieved, id : " , decodedFileChunk.id)
             

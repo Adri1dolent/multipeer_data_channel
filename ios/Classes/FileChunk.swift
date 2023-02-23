@@ -1,6 +1,6 @@
 import Foundation
 
-struct FileChunk : Encodable,Decodable {
+struct FileChunk : Codable {
         var id:Int
         var data:[UInt8]
     }

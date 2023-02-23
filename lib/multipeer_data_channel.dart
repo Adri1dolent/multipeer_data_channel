@@ -25,8 +25,6 @@ class MultipeerDataChannel extends DataChannel {
     methodChannel.invokeMethod("createReceiver");
     debugPrint("[MultipeerDataChannel] reciever created");
     methodChannel.setMethodCallHandler((call) => call.method == "chunkReceived"?onChunkRecieved(call.arguments):null);
-
-    //throw UnimplementedError();
   }
 
 
@@ -46,6 +44,7 @@ class MultipeerDataChannel extends DataChannel {
     // Send socket information to client.
     await channel.sendChannelMetadata(ChannelMetadata(super.identifier, "null", "null", "key"));
 
+    //Wait for client to connect
     await Future.doWhile(() async {
       await Future.delayed(Duration(milliseconds: isSenderReady ? 0 : 200));
       debugPrint("[MultipeerDataChannel] Waiting for client to connect");
@@ -61,7 +60,7 @@ class MultipeerDataChannel extends DataChannel {
   }
 
   onChunkRecieved(arguments) {
-    debugPrint("[MultipeerDataChannel] Chunk ${arguments["id"]} received");
+    //debugPrint("[MultipeerDataChannel] Chunk ${arguments["id"]} received");
     int id = arguments["id"];
     Uint8List data = arguments["data"];
     FileChunk fc = FileChunk(identifier: id, data: data);
