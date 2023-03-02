@@ -1,7 +1,5 @@
 library multipeer_data_channel;
 
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
@@ -24,6 +22,8 @@ class MultipeerDataChannel extends DataChannel {
     
     methodChannel.invokeMethod("createReceiver");
     debugPrint("[MultipeerDataChannel] reciever created");
+
+    //Handle call from swift side when data is received
     methodChannel.setMethodCallHandler((call) => call.method == "chunkReceived"?onChunkRecieved(call.arguments):null);
   }
 
@@ -34,6 +34,7 @@ class MultipeerDataChannel extends DataChannel {
 
     methodChannel.invokeMethod('createSender');
 
+    //Handle call from swift side
     methodChannel.setMethodCallHandler((call) {
       if(call.method == "onPeerConnected") {
         isSenderReady = true;

@@ -4,7 +4,6 @@ import os
 class MCReceiver: NSObject, ObservableObject {
     private var serviceType = "exmulti"
     private let myPeerId = MCPeerID(displayName: UIDevice.current.name)
-    private let serviceAdvertiser: MCNearbyServiceAdvertiser
     private let serviceBrowser: MCNearbyServiceBrowser
     private let session: MCSession
     private let methodChannel:FlutterMethodChannel
@@ -16,27 +15,33 @@ class MCReceiver: NSObject, ObservableObject {
 
         self.methodChannel = methodChannel
         session = MCSession(peer: myPeerId, securityIdentity: nil, encryptionPreference: .none)
-        serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
         serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
 
         super.init()
 
         session.delegate = self
-        serviceAdvertiser.delegate = self
+        serviceBrowser.delegate = self
 
-        serviceAdvertiser.startAdvertisingPeer()
+        serviceBrowser.startBrowsingForPeers()
     }
 
     deinit {
-        serviceAdvertiser.stopAdvertisingPeer()
+        serviceBrowser.stopBrowsingForPeers()
     }
 }
 
-extension MCReceiver: MCNearbyServiceAdvertiserDelegate {
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        invitationHandler(true, session)
-        self.serviceAdvertiser.stopAdvertisingPeer()
+extension MCReceiver: MCNearbyServiceBrowserDelegate {
+    
+    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
+        if(self.connectedPeer == nil ){
+            browser.invitePeer(peerID, to: session, withContext: nil, timeout: 10)
+        }
     }
+    
+    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+        
+    }
+
 }
 
 
